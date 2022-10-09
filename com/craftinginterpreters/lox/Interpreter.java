@@ -16,8 +16,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
       public int arity() { return 0; }
 
       @Override
-      public Object call(Interpreter interpreter,
-                         List<Object> arguments) {
+      public Object call(Interpreter interpreter, List<Object> arguments) {
         return (double)System.currentTimeMillis() / 1000.0;
       }
 
@@ -180,8 +179,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     if (!(callee instanceof LoxCallable)) {
-      throw new RuntimeError(expr.paren,
-          "Can only call functions and classes.");
+      throw new RuntimeError(expr.paren, "Can only call functions and classes.");
     }    
 
     LoxCallable function = (LoxCallable)callee;

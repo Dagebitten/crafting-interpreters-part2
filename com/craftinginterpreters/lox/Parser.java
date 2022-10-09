@@ -288,8 +288,7 @@ class Parser {
       } while (match(COMMA));
     }
 
-    Token paren = consume(RIGHT_PAREN,
-                          "Expect ')' after arguments.");
+    Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
 
     return new Expr.Call(callee, paren, arguments);
   }  
