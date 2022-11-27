@@ -12,6 +12,7 @@ abstract class Stmt {
     R visitReturnStmt(Return stmt);
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
+    R visitLambdaStmt(Lambda stmt);
   }
   static class Block extends Stmt {
     Block(List<Stmt> statements) {
@@ -38,9 +39,10 @@ abstract class Stmt {
     final Expr expression;
   }
   static class Function extends Stmt {
-    Function(Token name, Expr.Function function) {
+    Function(Token name, List<Token> params, List<Stmt> body) {
       this.name = name;
-      this.function = function;
+      this.params = params;
+      this.body = body;
     }
 
     @Override
@@ -49,7 +51,8 @@ abstract class Stmt {
     }
 
     final Token name;
-    final Expr.Function function;
+    final List<Token> params;
+    final List<Stmt> body;
   }
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
@@ -120,6 +123,18 @@ abstract class Stmt {
 
     final Expr condition;
     final Stmt body;
+  }
+  static class Lambda extends Stmt {
+    Lambda(Expr expression) {
+      this.expression = expression;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitLambdaStmt(this);
+    }
+
+    final Expr expression;
   }
 
   abstract <R> R accept(Visitor<R> visitor);

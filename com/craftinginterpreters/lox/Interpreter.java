@@ -111,7 +111,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   @Override
   public Object visitBinaryExpr(Expr.Binary expr) {
     Object left = evaluate(expr.left);
-    Object right = evaluate(expr.right); 
+    Object right = evaluate(expr.right);
 
     switch (expr.operator.type) {
       case MINUS:
@@ -120,7 +120,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
       case PLUS:
         if (left instanceof Double && right instanceof Double) {
           return (double)left + (double)right;
-        } 
+        }
 
         if (left instanceof String && right instanceof String) {
           return (String)left + (String)right;
@@ -158,13 +158,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     Object callee = evaluate(expr.callee);
 
     List<Object> arguments = new ArrayList<>();
-    for (Expr argument : expr.arguments) { 
+    for (Expr argument : expr.arguments) {
       arguments.add(evaluate(argument));
     }
 
     if (!(callee instanceof LoxCallable)) {
       throw new RuntimeError(expr.paren, "Can only call functions and classes.");
-    }    
+    }
 
     LoxCallable function = (LoxCallable)callee;
     if (arguments.size() != function.arity()) {
@@ -215,15 +215,25 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
-      String fnName = stmt.name.lexeme;
-      environment.define(fnName, new LoxFunction(fnName, stmt.function, environment));
-      return null;
+    LoxFunction function = new LoxFunction(stmt);
+    environment.define(stmt.name.lexeme, function);
+    return null;
   }
 
   @Override
-  public Object visitFunctionExpr(Expr.Function expr) {
-      return new LoxFunction(null, expr, environment);
-  }  
+  public Void visitLambdaStmt(Stmt.Lambda stmt){
+      Object expression = null;
+      if (stmt.expression != null) expression = evaluate(stmt.expression);
+      throw new Return(expression);
+  }
+  
+  // @Override
+  // public Void visitReturnStmt(Stmt.Return stmt) {
+  //   Object value = null;
+  //   if (stmt.value != null) value = evaluate(stmt.value);
+
+  //   throw new Return(value);
+  // }
 
    @Override
   public Void visitIfStmt(Stmt.If stmt) {

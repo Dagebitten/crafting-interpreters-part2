@@ -49,7 +49,7 @@ class Parser {
     if (match(RETURN)) return returnStatement();    
     if (match(WHILE)) return whileStatement();
     if (match(LEFT_BRACE)) return new Stmt.Block(block());
-    return expressionStatement();
+    return lambdaStatement();
   }
 
   private Stmt forStatement() {
@@ -148,12 +148,14 @@ class Parser {
     return new Stmt.Expression(expr);
   }
 
+  private Stmt lambdaStatement(){
+    Expr expr = expression();
+    consume(SEMICOLON, "Expect ';' after expression.");
+    return new Stmt.Lambda(expr);
+  }
+
   private Stmt.Function function(String kind) {
-    Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
-    // New Code
-    return new Stmt.Function(name, functionBody(kind));  
-    /* Old code
-      return new Stmt.Function(name, parameters, body);
+    Token name = consume(IDENTIFIER, "Expect " + kind + " name."); 
       consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
       List<Token> parameters = new ArrayList<>();
       if (!check(RIGHT_PAREN)) {
@@ -170,30 +172,9 @@ class Parser {
 
       consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
       List<Stmt> body = block();
-      return new Stmt.Function(name, parameters, body);  }  */
-
+      return new Stmt.Function(name, parameters, body);  
+  }
   
-  }
-
-  private Expr.Function functionBody(String kind) {
-    consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
-    List<Token> parameters = new ArrayList<>();
-    if (!check(RIGHT_PAREN)) {
-      do {
-        if (parameters.size() >= 8) {
-          error(peek(), "Can't have more than 8 parameters.");
-        }
-
-        parameters.add(consume(IDENTIFIER, "Expect parameter name."));
-      } while (match(COMMA));
-    }
-    consume(RIGHT_PAREN, "Expect ')' after parameters.");
-
-    consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
-    List<Stmt> body = block();
-    return new Expr.Function(parameters, body);
-  }
-
   private List<Stmt> block() {
     List<Stmt> statements = new ArrayList<>();
 
@@ -351,7 +332,6 @@ class Parser {
       consume(RIGHT_PAREN, "Expect ')' after expression.");
       return new Expr.Grouping(expr);
     }
-    if (match(FUN)) return functionBody("function");
     throw error(peek(), "Expect expression.");
   }
 
