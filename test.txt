@@ -1,7 +1,0 @@
-fun test() {
-  print(1);
-  print(2);
-  7;
-  print(3);
-}
-print test();
